@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karim OTP Spam Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007bff;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border-radius: 5px;
+            display: none;
+        }
+        .error {
+            color: #a94442;
+            background-color: #f2dede;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>بوت سبام OTP</h1>
+        <p>أدخل رقم جيزي وأرسل عدد الرموز التي ترغب في إرسالها</p>
+        
+        <input type="text" id="number" placeholder="أدخل رقم الهاتف (07xxxxxxxx)">
+        <input type="number" id="count" placeholder="عدد الرموز">
+        
+        <button id="sendBtn" onclick="startSending()">إرسال OTP</button>
+        <button id="stopBtn" disabled onclick="stopSending()">إيقاف الإرسال</button>
+        
+        <div class="result" id="resultMessage"></div>
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        let active = false;
+        let sentCount = 0;
+        let interval;
+
+        function startSending() {
+            const number = document.getElementById("number").value;
+            const count = parseInt(document.getElementById("count").value);
+            const resultMessage = document.getElementById("resultMessage");
+            const errorMessage = document.getElementById("errorMessage");
+
+            resultMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            if (!number.startsWith("07") || number.length !== 10) {
+                errorMessage.textContent = "❌ دير نميرو جيزي فقط!";
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (count <= 0) {
+                errorMessage.textContent = "❌ الرجاء إدخال عدد صحيح!";
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // البدء في الإرسال
+            active = true;
+            document.getElementById("sendBtn").disabled = true;
+            document.getElementById("stopBtn").disabled = false;
+            sentCount = 0;
+            resultMessage.textContent = `💬 يتم إرسال OTPs إلى الرقم ${number}`;
+            resultMessage.style.display = 'block';
+
+            interval = setInterval(() => {
+                if (sentCount < count && active) {
+                    sendOtp(number);
+                    sentCount++;
+                    resultMessage.textContent = `🔄 عدد رموز OTP المرسلة: ${sentCount}/${count}`;
+                } else {
+                    clearInterval(interval);
+                    resultMessage.textContent = `✅ تم إرسال ${sentCount} رمز بنجاح!`;
+                    document.getElementById("sendBtn").disabled = false;
+                    document.getElementById("stopBtn").disabled = true;
+                    active = false;
+                }
+            }, 1000); // إرسال كل ثانية
+        }
+
+        function stopSending() {
+            active = false;
+            clearInterval(interval);
+            document.getElementById("sendBtn").disabled = false;
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("resultMessage").textContent = "⏹️ تم إيقاف العملية بناءً على طلبك.";
+        }
+
+        function sendOtp(number) {
+            // هنا يمكنك إرسال طلب HTTP للموقع الذي ترسله إلى Djezzy
+            console.log(`إرسال OTP إلى الرقم 213${number.slice(1)}`);
+        }
+    </script>
+</body>
+</html>
